@@ -37,7 +37,7 @@ fastify.get('/health', async (request, reply) => {
 // Get all components
 fastify.get('/api/components', async (request, reply) => {
   try {
-    let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+    const config = await getConfig();
     return reply.status(200).send({
       status: 'success',
       data: config.components,
@@ -78,7 +78,7 @@ fastify.post('/api/work-orders', async (request, reply) => {
 
     // Get master values from component if not "Others" (untuk reference saja)
     if (!isOthersJob && componentNo) {
-      let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+      const config = await getConfig();
       const component = config.components.find((c: any) => c.no === componentNo);
       if (component) {
         baseTargetDays = component.baseTargetDays;
@@ -204,7 +204,7 @@ fastify.get('/api/work-orders/mechanic/:mechanicName', async (request, reply) =>
     );
 
     // Enrich dengan component description dari config
-    let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+    const config = await getConfig();
     const enrichedWOs = result.rows.map((wo: any) => {
       let componentDescription = wo.component_id || 'Others Job';
       
@@ -350,7 +350,7 @@ fastify.post('/api/approvals/submit', async (request, reply) => {
 
     // If APPROVED, insert into mechanic_points
     if (status === 'approved' && finalPoints) {
-      let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+      const config = await getConfig();
       
       // Get team members for this WO
       const teamResult = await db.query(
@@ -502,7 +502,7 @@ fastify.patch('/api/work-orders/:id', async (request, reply) => {
       updateFields.push(`completed_at = NOW() AT TIME ZONE 'Asia/Bangkok'`);
       
       try {
-        let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+        const config = await getConfig();
         const now = new Date();
         const startTime = new Date(wo.started_at).getTime();
         const endTime = now.getTime();
@@ -574,7 +574,7 @@ fastify.patch('/api/work-orders/:id', async (request, reply) => {
       paramCount++;
 
       try {
-        let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+        const config = await getConfig();
 
         if (wo.started_at) {
           const startTime = new Date(wo.started_at).getTime();
@@ -752,7 +752,7 @@ fastify.delete('/api/work-orders/:id', async (request, reply) => {
 // Config sync
 fastify.get('/api/config/sync', async (request, reply) => {
   try {
-    let config; try { config = await getConfig(); } catch(e) { console.error('[CONFIG ERROR]', e.message); config = { components: [], units: [], mechanics: [] }; }
+    const config = await getConfig();
     return reply.status(200).send({
       status: 'success',
       data: config,

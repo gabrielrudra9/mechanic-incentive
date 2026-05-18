@@ -1,4 +1,9 @@
-import fetch from "node-fetch";
+import dotenv from 'dotenv';
+import path from 'path';
+import fetch from 'node-fetch';
+
+// Load .env in configService too
+dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 let cachedConfig: any = null;
 let lastFetchTime = 0;

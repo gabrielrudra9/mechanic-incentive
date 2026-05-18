@@ -1,0 +1,6 @@
+Parameter,Value,Unit,Effective_Date
+Base Points Multiplier,10,points,5/12/2026
+Points to IDR Rate,50000,IDR/pt,5/12/2026
+MTBF Days Threshold,80,hours,5/12/2026
+On Time Days Buffer,0,days,5/12/2026
+Safety Incident Penalty,0,%,5/12/2026

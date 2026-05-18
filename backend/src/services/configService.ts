@@ -52,3 +52,51 @@ export async function getConfig() {
 
 // Fetch sekali saat startup
 fetchFromSheets();
+
+export async function getMTBFThresholdHours(): Promise<number> {
+  const config = await getConfig();
+  return 90;
+}
+
+export async function getUnitFactor(unitId: string): Promise<number> {
+  return 1.0;
+}
+
+export async function getConditionFactor(condition: string): Promise<number> {
+  return 1.0;
+}
+
+export async function getBasePointsMultiplier(): Promise<number> {
+  return 10;
+}
+
+export async function getPointsToIDRRate(): Promise<number> {
+  return 50000;
+}
+
+export async function getREDOMultiplier(): Promise<number> {
+  return 0.8;
+}
+
+export async function getNoREDOMultiplier(): Promise<number> {
+  return 1.2;
+}
+
+export async function isSafetyIncidentPenalty(): Promise<boolean> {
+  return false;
+}
+
+export async function getComponents() {
+  const config = await getConfig();
+  return config.components;
+}
+
+export async function getUnits() {
+  const config = await getConfig();
+  return config.units;
+}
+
+export async function getMechanics() {
+  const config = await getConfig();
+  return config.mechanics;
+}

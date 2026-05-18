@@ -776,7 +776,7 @@ fastify.setErrorHandler(async (error, request, reply) => {
 // Start
 const start = async () => {
   try {
-    const port = 3001;
+    const port = parseInt(process.env.PORT || '3001');
     await fastify.listen({ port, host: '0.0.0.0' });
     console.log(`Server running on http://localhost:${port}`);
   } catch (err) {

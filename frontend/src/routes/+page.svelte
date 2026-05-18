@@ -22,7 +22,7 @@
   let jobType = $state('');
   let teamSize = $state(1);
 
-  const BACKEND_URL = 'http://localhost:3017';
+  const BACKEND_URL = 'https://mechanic-incentive.up.railway.app';
 
   onMount(async () => {
     await loadComponents();

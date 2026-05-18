@@ -25,8 +25,7 @@ const fastify = Fastify({
 });
 
 await fastify.register(cors, {
-  origin: true,
-  credentials: true
+  origin: '*', credentials: false
 });
 
 // Health check
@@ -786,3 +785,4 @@ const start = async () => {
 };
 
 start();
+

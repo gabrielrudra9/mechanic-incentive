@@ -1,9 +1,9 @@
-﻿[build]
+[build]
 builder = "nixpacks"
 
 [build.nixpacks]
 aptPkgs = ["nodejs", "npm"]
-cmds = ["npm install", "npm run build"]
+cmds = ["npm ci --include=dev", "npm run build"]
 
 [deploy]
 startCommand = "npm start"

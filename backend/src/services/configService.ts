@@ -2,34 +2,30 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fetch from 'node-fetch';
 
-// Load .env in configService too
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 let cachedConfig: any = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 60000;
+let isFetching = false;
 
 async function fetchFromSheets() {
+  if (isFetching) return; // Skip if already fetching
+  
+  isFetching = true;
   try {
     console.log("[CONFIG] Fetching from Google Sheets...");
     const SHEET_ID = process.env.GOOGLE_SHEETS_ID;
     const API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
     
-    console.log("[CONFIG] SHEET_ID:", SHEET_ID);
-    console.log("[CONFIG] API_KEY:", API_KEY?.substring(0, 20) + "...");
-    
     if (!SHEET_ID || !API_KEY) {
-      throw new Error("Missing GOOGLE_SHEETS_ID or GOOGLE_SHEETS_API_KEY");
+      throw new Error("Missing env vars");
     }
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Components?key=${API_KEY}`;
-    
     const response = await fetch(url);
     
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Status ${response.status}: ${text.substring(0, 200)}`);
-    }
+    if (!response.ok) throw new Error(`Status ${response.status}`);
     
     const data = await response.json() as any;
     cachedConfig = {
@@ -44,20 +40,34 @@ async function fetchFromSheets() {
       mechanics: [],
       lastUpdated: new Date(),
     };
+    lastFetchTime = Date.now();
     console.log("[CONFIG] ? Success, components:", cachedConfig.components.length);
   } catch (error: any) {
     console.error("[CONFIG] Error:", error.message);
+    if (!cachedConfig) {
+      cachedConfig = { baseConfig: {}, redoConfig: {}, unitFactors: {}, workConditionFactors: {}, timelinessFactors: {}, safetySettings: {}, components: [], units: [], mechanics: [], lastUpdated: new Date() };
+    }
+  } finally {
+    isFetching = false;
   }
 }
 
 export async function getConfig() {
-  const now = Date.now();
-  if (!cachedConfig || now - lastFetchTime > CACHE_TTL) {
-    await fetchFromSheets();
+  // Return cache immediately (don't wait for fetch)
+  if (!cachedConfig) {
+    cachedConfig = { baseConfig: {}, redoConfig: {}, unitFactors: {}, workConditionFactors: {}, timelinessFactors: {}, safetySettings: {}, components: [], units: [], mechanics: [], lastUpdated: new Date() };
   }
-  return cachedConfig || { baseConfig: {}, redoConfig: {}, unitFactors: {}, workConditionFactors: {}, timelinessFactors: {}, safetySettings: {}, components: [], units: [], mechanics: [], lastUpdated: new Date() };
+  
+  // Fetch in background if cache expired
+  const now = Date.now();
+  if (now - lastFetchTime > CACHE_TTL) {
+    fetchFromSheets(); // Don't await!
+  }
+  
+  return cachedConfig;
 }
 
+// Initial fetch (don't wait)
 fetchFromSheets();
 
 export async function getMTBFThresholdHours(): Promise<number> { return 90; }

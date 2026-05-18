@@ -1,1 +1,1 @@
-﻿web: npm run start
+﻿web: cd frontend && npm run preview --host

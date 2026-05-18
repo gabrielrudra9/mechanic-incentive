@@ -1,5 +1,9 @@
-{
-  "dependencies": {
-    "papaparse": "^5.5.3"
+﻿{
+  "name": "mechanic-incentive",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "dev": "cd frontend && npm run dev"
   }
 }

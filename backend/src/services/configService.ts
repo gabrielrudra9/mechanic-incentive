@@ -53,3 +53,15 @@ export async function getConfig() {
     };
   }
 }
+
+export async function getMTBFThresholdHours(): Promise<number> {
+  return 90;
+}
+
+export async function getUnitFactor(unitId: string): Promise<number> {
+  return 1.0;
+}
+
+export async function getConditionFactor(condition: string): Promise<number> {
+  return 1.0;
+}

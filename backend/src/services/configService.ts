@@ -1,30 +1,18 @@
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-import path from "path";
+let cachedConfig: any = null;
+let lastFetchTime = 0;
+const CACHE_TTL = 60000; // 1 menit
 
-dotenv.config({ path: path.join(process.cwd(), ".env") });
-
-const SHEET_ID = process.env.GOOGLE_SHEETS_ID!;
-const API_KEY = process.env.GOOGLE_SHEETS_API_KEY!;
-
-export async function getConfig() {
+async function fetchFromSheets() {
   try {
     console.log("[CONFIG] Fetching from Google Sheets...");
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
     const ranges = ["BaseConfig!A:D", "Components!A:J", "Units!A:D", "Mechanics!A:E"];
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?ranges=${ranges.join("&ranges=")}&key=${API_KEY}`;
-
-    const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-
-    if (!response.ok) throw new Error(`Google Sheets API error: ${response.status}`);
-
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${process.env.GOOGLE_SHEETS_ID}/values:batchGet?ranges=${ranges.join("&ranges=")}&key=${process.env.GOOGLE_SHEETS_API_KEY}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Status ${response.status}`);
+    
     const data = await response.json() as any;
-    console.log("[CONFIG] ? Fetched successfully");
-
-    return {
+    cachedConfig = {
       baseConfig: {},
       redoConfig: {},
       unitFactors: {},
@@ -36,32 +24,31 @@ export async function getConfig() {
       mechanics: data.valueRanges?.[3]?.values?.slice(1) || [],
       lastUpdated: new Date(),
     };
+    lastFetchTime = Date.now();
+    console.log("[CONFIG] ? Fetched successfully");
   } catch (error: any) {
-    console.error("[CONFIG] ? Error:", error.message);
-    console.log("[CONFIG] Falling back to empty config");
-    return {
-      baseConfig: {},
-      redoConfig: {},
-      unitFactors: {},
-      workConditionFactors: {},
-      timelinessFactors: {},
-      safetySettings: {},
-      components: [],
-      units: [],
-      mechanics: [],
-      lastUpdated: new Date(),
-    };
+    console.error("[CONFIG] Fetch failed:", error.message);
   }
 }
 
-export async function getMTBFThresholdHours(): Promise<number> {
-  return 90;
+export async function getConfig() {
+  const now = Date.now();
+  if (!cachedConfig || now - lastFetchTime > CACHE_TTL) {
+    await fetchFromSheets();
+  }
+  return cachedConfig || {
+    baseConfig: {},
+    redoConfig: {},
+    unitFactors: {},
+    workConditionFactors: {},
+    timelinessFactors: {},
+    safetySettings: {},
+    components: [],
+    units: [],
+    mechanics: [],
+    lastUpdated: new Date(),
+  };
 }
 
-export async function getUnitFactor(unitId: string): Promise<number> {
-  return 1.0;
-}
-
-export async function getConditionFactor(condition: string): Promise<number> {
-  return 1.0;
-}
+// Fetch sekali saat startup
+fetchFromSheets();

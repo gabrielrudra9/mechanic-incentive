@@ -10,14 +10,20 @@ async function fetchFromSheets() {
     const SHEET_ID = process.env.GOOGLE_SHEETS_ID;
     const API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
     
+    console.log("[CONFIG] SHEET_ID:", SHEET_ID);
+    console.log("[CONFIG] API_KEY:", API_KEY?.substring(0, 20) + "...");
+    
+    if (!SHEET_ID || !API_KEY) {
+      throw new Error("Missing GOOGLE_SHEETS_ID or GOOGLE_SHEETS_API_KEY");
+    }
+    
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Components?key=${API_KEY}`;
     
-    console.log("[CONFIG] URL:", url.substring(0, 80) + "...");
     const response = await fetch(url);
     
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Status ${response.status}: ${text.substring(0, 100)}`);
+      throw new Error(`Status ${response.status}: ${text.substring(0, 200)}`);
     }
     
     const data = await response.json() as any;

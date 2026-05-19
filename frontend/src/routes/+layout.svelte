@@ -47,7 +47,7 @@
   </div>
 
   <footer class="footer">
-    <p>© 2026 Mechanic Incentive Tracking System | Backend: http://localhost:3017</p>
+    <p>© 2026 Mechanic Incentive Tracking System | Backend: https://mechanic-incentive.up.railway.app</p>
   </footer>
 </div>
 

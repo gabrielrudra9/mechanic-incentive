@@ -9,7 +9,7 @@
   let showFinishForm = $state(false);
   let finishNotes = $state('');
 
-  const BACKEND_URL = 'http://localhost:3017';
+  const BACKEND_URL = 'https://mechanic-incentive.up.railway.app';
 
   // ✅ Format waktu server - handle both database format dan ISO format dengan timezone benar
   function formatDateTime(isoString) {

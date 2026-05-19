@@ -4,7 +4,7 @@
   let pendingWOs = $state([]);
   let loading = $state(false);
 
-  const BACKEND_URL = 'http://localhost:3017';
+  const BACKEND_URL = 'https://mechanic-incentive.up.railway.app';
 
   onMount(async () => {
     await loadPendingApprovals();

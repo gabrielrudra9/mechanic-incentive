@@ -14,7 +14,7 @@
   let finalPoints = $state(0);
   let pointsPerMechanic = $state(0);
 
-  const BACKEND_URL = 'http://localhost:3017';
+  const BACKEND_URL = 'https://mechanic-incentive.up.railway.app';
 
   // ✅ Format waktu - handle semua format (T atau space)
   function formatDateTime(isoString) {

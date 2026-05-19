@@ -28,6 +28,14 @@ async function fetchSheet(sheetName: string): Promise<any[]> {
   }
 }
 
+function arrayToObject(rows: any[][], headers: string[]): any[] {
+  return rows.map(row => {
+    const obj: any = {};
+    headers.forEach((h, i) => obj[h] = row[i]);
+    return obj;
+  });
+}
+
 async function fetchFromSheets() {
   if (isFetching) return;
   
@@ -35,7 +43,7 @@ async function fetchFromSheets() {
   try {
     console.log("[CONFIG] Fetching all sheets from Google Sheets...");
     
-    const [components, units, mechanics, baseConfig, unitFactors, workConditionFactors, timelinessFactors, safetySettings, redoConfig] = await Promise.all([
+    const [componentsRaw, unitsRaw, mechanicsRaw, baseConfigRaw, unitFactorsRaw, workConditionFactorsRaw, timelinessFactorsRaw, safetySettingsRaw, redoConfigRaw] = await Promise.all([
       fetchSheet("Components"),
       fetchSheet("Units"),
       fetchSheet("Mechanics"),
@@ -47,13 +55,45 @@ async function fetchFromSheets() {
       fetchSheet("RedoConfig"),
     ]);
     
+    // Transform arrays to objects with id field
+    const components = componentsRaw.map((row: any[]) => ({
+      id: row[0],
+      no: row[0],
+      componentName: row[1],
+      technicalType: row[2],
+      loadJob: row[3],
+      baseTargetHours: row[4],
+      baseTargetDays: row[5],
+      basePoints: row[6],
+      jobAssignment: row[7],
+      teamSize: row[8],
+      isActive: row[9],
+    }));
+    
+    const units = unitsRaw.map((row: any[]) => ({
+      id: row[1],
+      no: row[0],
+      unitId: row[1],
+      unitName: row[2],
+      equipmentType: row[3],
+    }));
+    
+    const mechanics = mechanicsRaw.map((row: any[]) => ({
+      id: row[1],
+      no: row[0],
+      mechanicId: row[1],
+      mechanicName: row[2],
+      department: row[3],
+      status: row[4],
+    }));
+    
     cachedConfig = {
-      baseConfig: baseConfig,
-      redoConfig: redoConfig,
-      unitFactors: unitFactors,
-      workConditionFactors: workConditionFactors,
-      timelinessFactors: timelinessFactors,
-      safetySettings: safetySettings,
+      baseConfig: baseConfigRaw,
+      redoConfig: redoConfigRaw,
+      unitFactors: unitFactorsRaw,
+      workConditionFactors: workConditionFactorsRaw,
+      timelinessFactors: timelinessFactorsRaw,
+      safetySettings: safetySettingsRaw,
       components: components,
       units: units,
       mechanics: mechanics,
@@ -64,7 +104,7 @@ async function fetchFromSheets() {
     console.log("  - Components:", components.length);
     console.log("  - Units:", units.length);
     console.log("  - Mechanics:", mechanics.length);
-    console.log("  - BaseConfig:", baseConfig.length);
+    console.log("  - BaseConfig:", baseConfigRaw.length);
   } catch (error: any) {
     console.error("[CONFIG] Error:", error.message);
     if (!cachedConfig) {

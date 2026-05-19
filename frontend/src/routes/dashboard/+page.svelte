@@ -7,7 +7,7 @@
   let selectedMonth = $state(new Date().getMonth() + 1);
   let selectedYear = $state(new Date().getFullYear());
 
-  const BACKEND_URL = 'http://localhost:3017';
+  const BACKEND_URL = 'https://mechanic-incentive.up.railway.app';
 
   function getCurrentWeek() {
     const now = new Date();

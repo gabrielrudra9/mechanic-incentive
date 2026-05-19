@@ -270,10 +270,10 @@ fastify.get('/api/approvals/pending', async (request, reply) => {
        FROM work_orders wo 
        LEFT JOIN approvals a ON wo.id = a.work_order_id
        LEFT JOIN work_order_team wot ON wo.id = wot.work_order_id
-       WHERE wo.status = $1 
+       WHERE wo.status IN ($1, $2) 
        GROUP BY wo.id, a.id
        ORDER BY wo.created_at ASC`,
-      ['created']
+      ['created', 'wait_mtbf']
     );
     return result.rows;
   } catch (error: any) {
